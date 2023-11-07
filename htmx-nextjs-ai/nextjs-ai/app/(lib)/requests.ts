@@ -1,0 +1,33 @@
+import { completeWithGPT } from "./openai"
+
+const requests: Record<
+  string,
+  {
+    completion: string;
+    pending: boolean;
+  }
+> = {};
+
+export const getRequest = (requestId: string) => {
+  return requests[requestId];
+};
+
+export const startRequest = async (prompt: string) => {
+  const requestId = Math.random().toString(36).substring(2, 15);
+  requests[requestId] = {
+    completion: "",
+    pending: true,
+  };
+
+  completeWithGPT(
+    `Funny story about a ${prompt}`,
+    (text) => {
+      requests[requestId].completion = text;
+    },
+    () => {
+      requests[requestId].pending = false;
+    }
+  );
+
+  return requestId;
+};
